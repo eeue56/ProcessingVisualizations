@@ -14,7 +14,7 @@ int[] WHITE_PIXEL = {
 void setup() {
   size(1000, 500);
   smooth();
-  this.colorCodes = new Hashtable();
+  this.colorCodes = new Hashtable(10,0.2);
   this.START_X = width/2;
   this.START_Y = height/2;
   this.records = getDataFromFile("HEIGHTS OF LEADERS.csv", colorCodes);
@@ -65,8 +65,8 @@ void draw() {
   Record currentRecord;
   for (int i = 0; i < this.recordCount; i++) {
     currentRecord = this.records[i];
-    fill((Integer)colorCodes.get(currentRecord.country));
-    ellipse(map(currentRecord.heightInCM, 100, 200, 0, width), height/(i+1), 15, 15);
+    fill((Integer)this.colorCodes.get(currentRecord.country));
+    ellipse(map(currentRecord.heightInCM, 100, 200, 0, width), height/2, 15, 15);
   }
 }
 
