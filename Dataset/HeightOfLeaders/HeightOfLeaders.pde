@@ -1,51 +1,31 @@
 import java.util.Hashtable;
 
-Record[] records;
-int recordCount;
+Leader[] leaders;
+int leaderCount;
 int START_X;
 int START_Y;
 Hashtable colorCodes;
+Hashtable countries;
+String[] countryNames;
 int MAX_COLOR_VALUE = 255;
 int MIN_COLOR_VALUE = 0;
 int[] WHITE_PIXEL = {
-  0, 0, 0
+  255, 255, 255
 };
 
 void setup() {
   size(1000, 500);
   smooth();
-  this.colorCodes = new Hashtable(10,0.2);
+  this.colorCodes = new Hashtable();
+  this.countries = new Hashtable();
   this.START_X = width/2;
   this.START_Y = height/2;
-  this.records = getDataFromFile("HEIGHTS OF LEADERS.csv", colorCodes);
-  this.recordCount = records.length;
-  //println(records[0]);
-  //println(colorCodes.get("UK"));
+  getDataFromFile("HEIGHTS OF LEADERS.csv");
+  this.leaderCount = leaders.length;
 }
 
-Record[] getDataFromFile(String filename, Hashtable colorCodes) {
-  Record[] records;
-  String[] lines;
-  int recordCount = 0;
-  lines = loadStrings(filename);
-  records = new Record[lines.length];
-  
-  for (int x = 1; x < lines.length; x++) {
-    String[] pieces = split(lines[x], ",");
-    if (pieces.length==4) {
-      records[recordCount] = new Record(pieces);
-      if (!colorCodes.contains(pieces[3])){
-        colorCodes.put(pieces[3], randomColor());  
-      }
-      recordCount++;
-    }
-  }
-  
-  if (recordCount != records.length) {
-    records = (Record[]) subset(records, 0, recordCount);
-  }
-  
-  return records;
+void draw() {
+  drawIndividualLeaders();
 }
 
 void drawAxis(int startX, int endX, int startY, int endY) {
@@ -53,36 +33,101 @@ void drawAxis(int startX, int endX, int startY, int endY) {
   line(startX, startY, startX, endY);
 }
 
-color randomColor(){
+color randomColor() {
   int[] randomValues = new int[3];
-  for (int x = 0; x<3; x++) {
+  for (int x = 0; x < 3; x++) {
     randomValues[x] = int(random(MIN_COLOR_VALUE, MAX_COLOR_VALUE));
   }
   return color(randomValues[0], randomValues[1], randomValues[2]);
 }
 
-void draw() {
-  Record currentRecord;
-  for (int i = 0; i < this.recordCount; i++) {
-    currentRecord = this.records[i];
-    fill((Integer)this.colorCodes.get(currentRecord.country));
-    ellipse(map(currentRecord.heightInCM, 100, 200, 0, width), height/2, 15, 15);
+void getDataFromFile(String filename) {
+  String[] lines;
+  int recordCount = 0;
+  lines = loadStrings(filename);
+  this.leaders = new Leader[lines.length];
+
+  for (int x = 1; x < lines.length; x++) {
+    String[] pieces = split(lines[x], ",");
+    if (pieces.length == 4) {
+
+      String country = pieces[3];
+
+      leaders[recordCount] = new Leader(pieces);
+      setColorCode(country);
+      setCountry(country, recordCount);
+      
+      recordCount++;
+    }
+  }
+
+  verifiyLeadersLength(recordCount);  
+
+}
+
+void verifiyLeadersLength(int recordCount){
+  if (recordCount != this.leaders.length) {
+    this.leaders = (Leader[]) subset(this.leaders, 0, recordCount);
+  } 
+}
+
+void setColorCode(String country) {
+  if (!this.colorCodes.contains(country)) {
+    this.colorCodes.put(country, randomColor());
   }
 }
 
+void setCountry(String country, int recordCount) {
+  if (!this.countries.contains(country)) {
+    //this.countryNames.add(country);
+    this.countries.put(country, new Country());
+  }
+  Country currentCountry = (Country)this.countries.get(country);
+  currentCountry.addMember(this.leaders[recordCount].heightInCM);
+  this.countries.put(country, currentCountry);
+}
 
+void drawIndividualLeaders() {
+  Leader currentRecord;
+  for (int i = 0; i < this.leaderCount; i++) {
+    currentRecord = this.leaders[i];
+    fill((Integer)colorCodes.get(currentRecord.country));
+    ellipse(map(currentRecord.heightInCM, 100, 200, 0, width), height/(i+1), 20, 20);
+  }
+}
 
-class Record {
+class Country {
+  int members;
+  Hashtable memberHeights;
+
+  public Country() {
+    this.members = 0;
+    this.memberHeights = new Hashtable();
+  } 
+
+  void addMember(int memberHeight) {
+    this.members++;
+    if (!this.memberHeights.contains(memberHeight)) {
+      this.memberHeights.put(memberHeight, 1);
+    }
+    else {
+      int currentCount = (Integer)memberHeights.get(memberHeight);
+      this.memberHeights.put(memberHeight, currentCount++);
+    }
+  }
+}
+
+class Leader {
   String name;
   int heightInCM;
   String heightInFeet;
   String country;
 
-  public Record(String[] pieces) {
-    name = pieces[0];
-    heightInCM = int(pieces[1]);
-    heightInFeet = pieces[2];
-    country = pieces[3];
+  public Leader(String[] pieces) {
+    this.name = pieces[0];
+    this.heightInCM = int(pieces[1]);
+    this.heightInFeet = pieces[2];
+    this.country = pieces[3];
   }
 }
 
