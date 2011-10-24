@@ -1,4 +1,5 @@
 import java.util.Hashtable;
+import java.util.Enumeration;
 
 Leader[] leaders;
 int leaderCount;
@@ -22,6 +23,7 @@ void setup() {
   this.START_Y = height/2;
   getDataFromFile("HEIGHTS OF LEADERS.csv");
   this.leaderCount = leaders.length;
+  drawKey(this.colorCodes);
 }
 
 void draw() {
@@ -31,6 +33,17 @@ void draw() {
 void drawAxis(int startX, int endX, int startY, int endY) {
   line(startX, startY, startX, endX);
   line(startX, startY, startX, endY);
+}
+
+void drawKey(Hashtable colorCodes) {
+  int startX = 10;
+  int startY = 20;
+  for (Enumeration e = colorCodes.keys(); e.hasMoreElements(); ) {
+    String currentKey = e.nextElement().toString();
+    fill((Integer)colorCodes.get(currentKey));
+    text(currentKey, startX, startY);
+    startY += 12;
+  }
 }
 
 color randomColor() {
@@ -56,19 +69,18 @@ void getDataFromFile(String filename) {
       leaders[recordCount] = new Leader(pieces);
       setColorCode(country);
       setCountry(country, recordCount);
-      
+
       recordCount++;
     }
   }
 
-  verifiyLeadersLength(recordCount);  
-
+  verifiyLeadersLength(recordCount);
 }
 
-void verifiyLeadersLength(int recordCount){
+void verifiyLeadersLength(int recordCount) {
   if (recordCount != this.leaders.length) {
     this.leaders = (Leader[]) subset(this.leaders, 0, recordCount);
-  } 
+  }
 }
 
 void setColorCode(String country) {
@@ -92,7 +104,7 @@ void drawIndividualLeaders() {
   for (int i = 0; i < this.leaderCount; i++) {
     currentRecord = this.leaders[i];
     fill((Integer)colorCodes.get(currentRecord.country));
-    ellipse(map(currentRecord.heightInCM, 100, 200, 0, width), height/(i+1), 20, 20);
+    ellipse(map(currentRecord.heightInCM, 100, 200, 0, width), height/2, 20, 20);
   }
 }
 

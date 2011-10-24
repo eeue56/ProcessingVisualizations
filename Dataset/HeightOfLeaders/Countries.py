@@ -36,6 +36,9 @@ class Country(object):
     def tallest_member(self):
         tallest_member = sorted(self.members.iteritems(), key=lambda (k, v): (v, k))[-1]
         return tallest_member[0]
+
+    def average_height(self):
+        return sum(member.height for member in self.members.values())/float(self.number_of_members())
     
 
 
@@ -43,7 +46,7 @@ class Member(object):
 
     def __init__(self, name, height_in_cm):
         self.name = name
-        self.height = height_in_cm
+        self.height = float(height_in_cm)
 
     def __str__(self):
         return repr(self.name)

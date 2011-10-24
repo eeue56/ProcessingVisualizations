@@ -22,13 +22,13 @@ def main(filename):
     countries = read_leaders(filename)
     for country in countries.values():
         print country.name
-        for member in country.members.values():
-            print repr(member)
             
         print 'Number of members: {}'.format(country.number_of_members())
         print 'The tallest member is {}, who is {}cm'.format(country.tallest_member(),country.tallest_height())
         print 'The shortest member is {}, who is {}cm'.format(country.shortest_member(),country.shortest_height())
+        print 'The average height is {:2g}cm'.format(country.average_height())
         print '\n\n'
+       
 
 
 if __name__ == '__main__':
