@@ -21,6 +21,7 @@ void setup() {
   this.countries = new Hashtable();
   this.START_X = width/2;
   this.START_Y = height/2;
+  background(color(255,255,255));
   getDataFromFile("HEIGHTS OF LEADERS.csv");
   this.leaderCount = leaders.length;
   drawKey(this.colorCodes);

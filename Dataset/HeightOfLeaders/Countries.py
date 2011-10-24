@@ -28,7 +28,7 @@ class Country(object):
         del self.members
         self.members = dict()
 
-    def __verify_at_least_1_member(self):
+    def _verify_at_least_1_member(self):
         if self.number_of_members() == 0:
             raise ValueError('Must have at least one member!')
 
@@ -36,25 +36,25 @@ class Country(object):
         return len(self.members)
 
     def tallest_height(self):
-        self.__verify_at_least_1_member()
+        self._verify_at_least_1_member()
         return max(member.height for member in self.members.values())
 
     def shortest_height(self):
-        self.__verify_at_least_1_member()
+        self._verify_at_least_1_member()
         return min(member.height for member in self.members.values())
 
     def shortest_member(self):
-        self.__verify_at_least_1_member()
+        self._verify_at_least_1_member()
         shortest_member = sorted(self.members.iteritems(), key=lambda (k, v): (v, k))[0]
         return shortest_member[0]
 
     def tallest_member(self):
-        self.__verify_at_least_1_member()
+        self._verify_at_least_1_member()
         tallest_member = sorted(self.members.iteritems(), key=lambda (k, v): (v, k))[-1]
         return tallest_member[0]
 
     def average_height(self):
-        self.__verify_at_least_1_member()
+        self._verify_at_least_1_member()
         return sum(member.height for member in self.members.values())/float(self.number_of_members())
 
 
@@ -76,6 +76,7 @@ class Member(object):
 def test():
     country = Country('UK')
     country.add_members([('George',129),('Harry',140)])
+    country.add_member('Dick', 143)
     print repr(country)
     country.remove_all_members()
     print repr(country)
