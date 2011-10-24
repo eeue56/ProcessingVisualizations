@@ -9,8 +9,8 @@ def read_leaders(filename):
             name, height, rubbish , country = [piece.strip() for piece in line.split(',')]
             if country not in countries:
                 countries[country] = Country(country)
-            countries[country].add_member(name, height) 
-                
+            countries[country].add_member(name, height)
+            
     return countries
                 
                 
@@ -18,8 +18,7 @@ def main(filename):
     
     countries = read_leaders(filename)
     for country in countries.values():
-        print country.name
-            
+        print country.name            
         print 'Number of members: {}'.format(country.number_of_members())
         print 'The tallest member is {}, who is {}cm'.format(country.tallest_member(),country.tallest_height())
         print 'The shortest member is {}, who is {}cm'.format(country.shortest_member(),country.shortest_height())
