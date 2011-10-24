@@ -39,7 +39,6 @@ class Country(object):
 
     def average_height(self):
         return sum(member.height for member in self.members.values())/float(self.number_of_members())
-    
 
 
 class Member(object):

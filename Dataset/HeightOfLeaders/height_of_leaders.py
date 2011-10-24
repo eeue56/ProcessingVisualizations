@@ -14,9 +14,6 @@ def read_leaders(filename):
     return countries
                 
                 
-
-
-
 def main(filename):
     
     countries = read_leaders(filename)
