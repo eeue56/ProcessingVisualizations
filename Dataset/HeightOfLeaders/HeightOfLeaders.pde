@@ -6,8 +6,10 @@ Leader[] leaders;
 int leaderCount;
 int START_X;
 int START_Y;
-int minHeight;
-int maxHeight;
+int minLeaderHeight;
+int maxLeaderHeight;
+int minWidth;
+int maxWidth;
 Hashtable colorCodes;
 Hashtable keyBounds;
 Hashtable countryLocations;
@@ -36,8 +38,10 @@ class Leader {
 void setup() {
   size(1000, 500);
   smooth();
-  this.minHeight = 1000;
-  this.maxHeight = 0;
+  this.minLeaderHeight = 1000;
+  this.maxLeaderHeight = 0;
+  this.minWidth = 80;
+  this.maxWidth = this.width - 20;
   this.colorCodes = new Hashtable();
   this.countryLocations = new Hashtable();
   this.keyBounds = new Hashtable();
@@ -53,12 +57,14 @@ void setup() {
 void draw() {
 }
 
+
+
 void mouseClicked() {
   /**
-  *  Cycles through each country to find which name was clicked on, then draw accordingly
-  *
-  *
-  */
+   *  Cycles through each country to find which name was clicked on, then draw accordingly
+   *
+   *
+   */
   if (this.mouseX < 80) {
     for (Enumeration e = this.keyBounds.keys(); e.hasMoreElements(); ) {
       int currentKey = (Integer) e.nextElement();
@@ -72,7 +78,7 @@ void mouseClicked() {
         else {
           if (this.mouseButton == LEFT) {
             this.cleanScreen();
-            drawSingleCountry(currentCountry, (Integer)this.countryLocations.get(currentCountry));
+            this.drawSingleCountry(currentCountry, (Integer)this.countryLocations.get(currentCountry));
           }
           else {
             this.drawSingleCountry(currentCountry, (Integer)this.countryLocations.get(currentCountry));
@@ -84,23 +90,31 @@ void mouseClicked() {
   }
 }
 
+boolean isIt(int x, int y, color colorID){
+  loadPixels();
+  int loc = x + y * this.width;
+  if (this.pixels[loc] == colorID){
+    return true;
+  }
+  return false;
+}
 
 void cleanScreen() {
   /**
-  *  Cleans the screen of everything, then draws the key
-  */
+   *  Cleans the screen of everything, then draws the key
+   */
   background(255);
   this.drawKey(this.colorCodes);
 }
 
 boolean near(int firstPoint, int secondPoint, int tolerance) {
   /**
-  *  Some magic to work out if a point is near to another
-  * @param firstPoint The inital point
-  * @param secondPoint The second point
-  * @param tolerance The tolerance with which to calculate
-  * @return True if near, false otherwise
-  */
+   *  Some magic to work out if a point is near to another
+   * @param firstPoint The inital point
+   * @param secondPoint The second point
+   * @param tolerance The tolerance with which to calculate
+   * @return True if near, false otherwise
+   */
   if ((firstPoint - tolerance < secondPoint) && (firstPoint + tolerance > secondPoint)) {
     return true;
   }
@@ -109,17 +123,17 @@ boolean near(int firstPoint, int secondPoint, int tolerance) {
 
 void drawAxis(int startX, int endX, int startY, int endY) {
   /**
-  *  Draws axis starting at a given point and ending at two given points
-  *
-  */
+   *  Draws axis starting at a given point and ending at two given points
+   *
+   */
   line(startX, startY, startX, endX);
   line(startX, startY, startX, endY);
 }
 
 Hashtable drawKey(Hashtable colorCodes) {
   /**
-  *  Draws a key from given colorCodes
-  */
+   *  Draws a key from given colorCodes
+   */
   int startX = 10;
   int startY = 20;
   Hashtable keys = new Hashtable();
@@ -137,10 +151,23 @@ Hashtable drawKey(Hashtable colorCodes) {
   return keys;
 }
 
+void drawHorizontalLine(int y, int maxX, color colorID) {
+  loadPixels();
+  for (int x = 0; x < maxX; x++) {
+    colorPixel(x, y, colorID);
+  }
+  updatePixels();
+}
+
+void colorPixel(int x, int y, color colorID) {
+  int loc = x + y * this.width;
+  this.pixels[loc] = colorID;
+}
+
 color randomColor() {
   /**
-  *  Returns a random color in the range of min and max color values
-  */
+   *  Returns a random color in the range of min and max color values
+   */
   int[] randomValues = new int[3];
   for (int x = 0; x < 3; x++) {
     randomValues[x] = int(random(this.MIN_COLOR_VALUE, this.MAX_COLOR_VALUE));
@@ -161,12 +188,12 @@ void getDataFromFile(String filename) {
       String country = pieces[3];
       leaders[recordCount] = new Leader(pieces);
       this.setColorCode(country);
-      
-      if (leaders[recordCount].heightInCM < this.minHeight) {
-        this.minHeight = leaders[recordCount].heightInCM;
+
+      if (leaders[recordCount].heightInCM < this.minLeaderHeight) {
+        this.minLeaderHeight = leaders[recordCount].heightInCM;
       }
-      if (leaders[recordCount].heightInCM > this.maxHeight) {
-        this.maxHeight = leaders[recordCount].heightInCM;
+      if (leaders[recordCount].heightInCM > this.maxLeaderHeight) {
+        this.maxLeaderHeight = leaders[recordCount].heightInCM;
       }
       recordCount++;
     }
@@ -200,14 +227,17 @@ void drawSingleCountry(String country, int lineHeight) {
   for (int i = 0; i < this.leaderCount; i++) {
     currentRecord = this.leaders[i];
     if (currentRecord.country.equals(country)) {
-        this.drawLeader(currentRecord, (Integer)this.countryLocations.get(currentRecord.country));
+      this.drawLeader(currentRecord, (Integer)this.countryLocations.get(currentRecord.country));
     }
   }
 }
 
-void drawLeader(Leader currentRecord, int lineHeight){
+void drawLeader(Leader currentRecord, int lineHeight) {
   fill((Integer) colorCodes.get(currentRecord.country));
-  ellipseMode(CENTER);
-  ellipse(map(currentRecord.heightInCM, this.minHeight, this.maxHeight, 80, this.width-70), lineHeight, 15, 15);
+  //ellipseMode(CENTER);
+  float location = map(currentRecord.heightInCM, this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+  //float ellipseSize = map(currentRecord.heightInCM, this.minLeaderHeight, this.maxLeaderHeight, 10, 30);
+  float ellipseSize = 15;
+  ellipse(location, lineHeight, ellipseSize, ellipseSize);
 }
 
