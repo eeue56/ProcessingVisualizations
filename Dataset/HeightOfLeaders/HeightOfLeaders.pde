@@ -1,8 +1,10 @@
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 Leader[] leaders;
+ArrayList<Country> countries;
 int leaderCount;
 int START_X;
 int START_Y;
@@ -20,18 +22,57 @@ int[] WHITE_PIXEL = {
   255, 255, 255
 };
 
+class Country {
+  String name;                                                                                                                                                                                             
+  color colorID;
+  int lineHeight;
+  ArrayList<Leader> members;
+  
+  public Country (String name, int lineHeight, color colorID){
+    this.name = name;
+    this.lineHeight = lineHeight;
+    this.colorID = colorID;
+    this.members = new ArrayList();
+  }
+  
+  void addLeader(Leader leader){
+    members.add(leader);
+  } 
+  
+  void draw(int minHeight, int maxHeight, int minWidth, int maxWidth){
+  	for (int x = 0; x < this.members.size(); x++){
+  		members.get(x).draw(this.lineHeight, minHeight, maxHeight, minWidth, maxWidth);
+  	}
+  }
+  
+  void drawKey(){
+  	fill(this.colorID);
+  	text(this.name, 20, this.lineHeight);
+	}
+  
+}
+
 class Leader {
   String name;
   int heightInCM;
   String heightInFeet;
-  String country;
+  Country country;
+  int size;
 
-  public Leader(String[] pieces) {
+  public Leader(String[] pieces, Country country) {
     this.name = pieces[0];
     this.heightInCM = int(pieces[1]);
     this.heightInFeet = pieces[2];
-    this.country = pieces[3];
+    this.country = country;
+    this.size = 15;
   }
+  
+  void draw(int lineHeight, int minHeight, int maxHeight, int minWidth, int maxWidth){
+    fill(this.country.colorID);
+    float location = map(this.heightInCM, minHeight, maxHeight, minWidth, maxWidth);
+    ellipse(location, lineHeight, this.size, this.size);  
+  }
+  
 }
 
 
@@ -40,7 +81,8 @@ void setup() {
   smooth();
   this.minLeaderHeight = 1000;
   this.maxLeaderHeight = 0;
-  this.minWidth = 80;
+  this.minWidth = 90;
+  this.countries = new ArrayList();
   this.maxWidth = this.width - 20;
   this.colorCodes = new Hashtable();
   this.countryLocations = new Hashtable();
@@ -50,11 +92,11 @@ void setup() {
   background(color(255, 255, 255));
   this.getDataFromFile("HEIGHTS OF LEADERS.csv");
   this.leaderCount = this.leaders.length;
-  this.keyBounds = this.drawKey(this.colorCodes);
   this.drawCountries();
 }
 
 void draw() {
+  //drawAxis(this.minWidth - 10, this.maxWidth, 10, this.height -10);
 }
 
 
@@ -66,22 +108,24 @@ void mouseClicked() {
    *
    */
   if (this.mouseX < 80) {
-    for (Enumeration e = this.keyBounds.keys(); e.hasMoreElements(); ) {
-      int currentKey = (Integer) e.nextElement();
-      if (near(this.mouseY, currentKey, 10)) {
-        String currentCountry = this.keyBounds.get(currentKey).toString();
-        if (currentCountry.equals("All")) {
+    for (int i = 0; i < this.countries.size(); i++ ) {
+      int countryPoint = this.countries.get(i).lineHeight;
+      if (isNear(this.mouseY, countryPoint, 10)) {
+        /*if (currentCountry.equals("All")) {
           this.cleanScreen();
           this.drawCountries(); 
           break;
+        }*/
+        if (false){
+          
         }
         else {
           if (this.mouseButton == LEFT) {
             this.cleanScreen();
-            this.drawSingleCountry(currentCountry, (Integer)this.countryLocations.get(currentCountry));
+            this.countries.get(i).draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
           }
           else {
-            this.drawSingleCountry(currentCountry, (Integer)this.countryLocations.get(currentCountry));
+            this.countries.get(i).draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
           }
           break;
         }
@@ -104,10 +148,10 @@ void cleanScreen() {
    *  Cleans the screen of everything, then draws the key
    */
   background(255);
-  this.drawKey(this.colorCodes);
+  this.drawKey();
 }
 
-boolean near(int firstPoint, int secondPoint, int tolerance) {
+boolean isNear(int firstPoint, int secondPoint, int tolerance) {
   /**
    *  Some magic to work out if a point is near to another
    * @param firstPoint The inital point
@@ -130,25 +174,14 @@ void drawAxis(int startX, int endX, int startY, int endY) {
   line(startX, startY, startX, endY);
 }
 
-Hashtable drawKey(Hashtable colorCodes) {
+void drawKey() {
   /**
    *  Draws a key from given colorCodes
    */
-  int startX = 10;
-  int startY = 20;
-  Hashtable keys = new Hashtable();
-  for (Enumeration e = colorCodes.keys(); e.hasMoreElements(); ) {
-    String currentKey = e.nextElement().toString();
-    fill( (Integer) colorCodes.get(currentKey));
-    text(currentKey, startX, startY);
-    keys.put(startY, currentKey);
-    this.countryLocations.put(currentKey, startY);
-    startY += 20;
+   
+  for (int i = 0; i < this.countries.size(); i++){
+  	this.countries.get(i).drawKey();
   }
-  fill(color(0, 0, 0));
-  text("All", startX, startY);
-  keys.put(startY, "All");
-  return keys;
 }
 
 void drawHorizontalLine(int y, int maxX, color colorID) {
@@ -180,25 +213,31 @@ void getDataFromFile(String filename) {
   int recordCount = 0;
   lines = loadStrings(filename);
   this.leaders = new Leader[lines.length];
+  int lineHeight = 20;
 
   for (int x = 1; x < lines.length; x++) {
     String[] pieces = split(lines[x], ",");
     if (pieces.length == 4) {
 
       String country = pieces[3];
-      leaders[recordCount] = new Leader(pieces);
-      this.setColorCode(country);
+      Country currentCountry = new Country(country, lineHeight, randomColor());
+      this.countries.add(currentCountry);
+      
+      this.leaders[recordCount] = new Leader(pieces, currentCountry);
 
-      if (leaders[recordCount].heightInCM < this.minLeaderHeight) {
-        this.minLeaderHeight = leaders[recordCount].heightInCM;
+      if (this.leaders[recordCount].heightInCM < this.minLeaderHeight) {
+        this.minLeaderHeight = this.leaders[recordCount].heightInCM;
       }
-      if (leaders[recordCount].heightInCM > this.maxLeaderHeight) {
-        this.maxLeaderHeight = leaders[recordCount].heightInCM;
+      if (this.leaders[recordCount].heightInCM > this.maxLeaderHeight) {
+        this.maxLeaderHeight = this.leaders[recordCount].heightInCM;
       }
+      
       recordCount++;
+      lineHeight += 20;
+    
     }
   }
-
+  
   verifiyLeadersLength(recordCount);
 }
 
@@ -208,36 +247,18 @@ void verifiyLeadersLength(int recordCount) {
   }
 }
 
-void setColorCode(String country) {
-  if (!this.colorCodes.contains(country)) {
-    this.colorCodes.put(country, randomColor());
-  }
-}
-
 void drawCountries() {
-  Leader currentRecord;
-  for (int i = 0; i < this.leaderCount; i++) {
-    currentRecord = this.leaders[i];
-    this.drawLeader(currentRecord, (Integer)this.countryLocations.get(currentRecord.country));
+  for (int i = 0; i < this.countries.size(); i++) {
+    this.countries.get(i).draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
   }
 }
 
-void drawSingleCountry(String country, int lineHeight) {
-  Leader currentRecord;
-  for (int i = 0; i < this.leaderCount; i++) {
-    currentRecord = this.leaders[i];
-    if (currentRecord.country.equals(country)) {
-      this.drawLeader(currentRecord, (Integer)this.countryLocations.get(currentRecord.country));
+void drawSingleCountry(String country) {
+  Country currentCountry;
+  for (int i = 0; i < this.countries.size(); i++) {
+    currentCountry = this.countries.get(i);
+    if (currentCountry.name.equals(country)) {
+    	currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
     }
   }
 }
-
-void drawLeader(Leader currentRecord, int lineHeight) {
-  fill((Integer) colorCodes.get(currentRecord.country));
-  //ellipseMode(CENTER);
-  float location = map(currentRecord.heightInCM, this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
-  //float ellipseSize = map(currentRecord.heightInCM, this.minLeaderHeight, this.maxLeaderHeight, 10, 30);
-  float ellipseSize = 15;
-  ellipse(location, lineHeight, ellipseSize, ellipseSize);
-}
-
