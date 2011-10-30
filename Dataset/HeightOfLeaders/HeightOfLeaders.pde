@@ -1,10 +1,12 @@
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Enumeration;
 import java.util.Arrays;
 import java.util.ArrayList;
 
 Leader[] leaders;
-ArrayList<Country> countries;
+HashMap<String, Country> countries;
+int lineHeight;
 int leaderCount;
 int START_X;
 int START_Y;
@@ -12,10 +14,6 @@ int minLeaderHeight;
 int maxLeaderHeight;
 int minWidth;
 int maxWidth;
-Hashtable colorCodes;
-Hashtable keyBounds;
-Hashtable countryLocations;
-String[] countryNames;
 int MAX_COLOR_VALUE = 230;
 int MIN_COLOR_VALUE = 0;
 int[] WHITE_PIXEL = {
@@ -26,30 +24,49 @@ class Country {
   String name;                                                                                                                                                                                             
   color colorID;
   int lineHeight;
-  ArrayList<Leader> members;
-  
-  public Country (String name, int lineHeight, color colorID){
+  ArrayList<Leader> leaders;
+
+  public Country (String name, int lineHeight, color colorID) {
     this.name = name;
     this.lineHeight = lineHeight;
     this.colorID = colorID;
-    this.members = new ArrayList();
+    this.leaders = new ArrayList();
   }
-  
-  void addLeader(Leader leader){
-    members.add(leader);
+
+  void addLeader(Leader leader) {
+    leaders.add(leader);
   } 
-  
-  void draw(int minHeight, int maxHeight, int minWidth, int maxWidth){
-  	for (int x = 0; x < this.members.size(); x++){
-  		members.get(x).draw(this.lineHeight, minHeight, maxHeight, minWidth, maxWidth);
-  	}
+
+  void draw(int minHeight, int maxHeight, int minWidth, int maxWidth) {
+    for (int i = 0; i < this.leaders.size(); i++) {
+      this.leaders.get(i).draw(this.lineHeight, minHeight, maxHeight, minWidth, maxWidth);
+    }
   }
-  
-  void drawKey(){
-  	fill(this.colorID);
-  	text(this.name, 20, this.lineHeight);
-	}
-  
+
+  void drawKey() {
+    fill(this.colorID);
+    text(this.name, 20, this.lineHeight);
+  }
+
+  double averageHeight() {
+    int totalHeight = 0;
+    for (int i = 0; i < this.leaders.size(); i++) {
+      totalHeight += this.leaders.get(i).heightInCM;
+    }
+    return (double) totalHeight / this.leaders.size();
+  }
+
+  Leader tallestLeader() {
+    Leader tallest = this.leaders.get(0);
+    int maxHeight = tallest.heightInCM;
+    for (int i = 0; i < this.leaders.size(); i++) {
+      if (this.leaders.get(i).heightInCM > maxHeight) {
+        tallest = this.leaders.get(i);
+      }
+    }
+
+    return tallest;
+  }
 }
 
 class Leader {
@@ -66,33 +83,31 @@ class Leader {
     this.country = country;
     this.size = 15;
   }
-  
-  void draw(int lineHeight, int minHeight, int maxHeight, int minWidth, int maxWidth){
+
+  void draw(int lineHeight, int minHeight, int maxHeight, int minWidth, int maxWidth) {
     fill(this.country.colorID);
     float location = map(this.heightInCM, minHeight, maxHeight, minWidth, maxWidth);
-    ellipse(location, lineHeight, this.size, this.size);  
+    ellipse(location, lineHeight, this.size, this.size);
   }
-  
 }
 
 
 void setup() {
   size(1000, 500);
   smooth();
+  this.lineHeight = 20;
   this.minLeaderHeight = 1000;
   this.maxLeaderHeight = 0;
   this.minWidth = 90;
-  this.countries = new ArrayList();
+  this.countries = new HashMap();
   this.maxWidth = this.width - 20;
-  this.colorCodes = new Hashtable();
-  this.countryLocations = new Hashtable();
-  this.keyBounds = new Hashtable();
   this.START_X = this.width/2;
   this.START_Y = this.height/2;
   background(color(255, 255, 255));
   this.getDataFromFile("HEIGHTS OF LEADERS.csv");
   this.leaderCount = this.leaders.length;
   this.drawCountries();
+  this.drawKey();
 }
 
 void draw() {
@@ -107,25 +122,25 @@ void mouseClicked() {
    *
    *
    */
+
   if (this.mouseX < 80) {
-    for (int i = 0; i < this.countries.size(); i++ ) {
-      int countryPoint = this.countries.get(i).lineHeight;
+    Country currentCountry;
+    for (Enumeration<Country> e = Collections.enumeration(this.countries.values()); e.hasMoreElements();) {
+      currentCountry = e.nextElement();
+      int countryPoint = currentCountry.lineHeight;
       if (isNear(this.mouseY, countryPoint, 10)) {
-        /*if (currentCountry.equals("All")) {
+        if (currentCountry.name.equals("All")) {
           this.cleanScreen();
           this.drawCountries(); 
           break;
-        }*/
-        if (false){
-          
         }
         else {
           if (this.mouseButton == LEFT) {
             this.cleanScreen();
-            this.countries.get(i).draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+            currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
           }
           else {
-            this.countries.get(i).draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+            currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
           }
           break;
         }
@@ -134,10 +149,10 @@ void mouseClicked() {
   }
 }
 
-boolean isIt(int x, int y, color colorID){
+boolean isIt(int x, int y, color colorID) {
   loadPixels();
   int loc = x + y * this.width;
-  if (this.pixels[loc] == colorID){
+  if (this.pixels[loc] == colorID) {
     return true;
   }
   return false;
@@ -178,9 +193,11 @@ void drawKey() {
   /**
    *  Draws a key from given colorCodes
    */
-   
-  for (int i = 0; i < this.countries.size(); i++){
-  	this.countries.get(i).drawKey();
+
+  Country currentCountry; 
+  for (Enumeration e = Collections.enumeration(this.countries.values()); e.hasMoreElements(); ) {
+    currentCountry = (Country)e.nextElement();
+    currentCountry.drawKey();
   }
 }
 
@@ -214,16 +231,19 @@ void getDataFromFile(String filename) {
   lines = loadStrings(filename);
   this.leaders = new Leader[lines.length];
   int lineHeight = 20;
+  Country currentCountry;
 
   for (int x = 1; x < lines.length; x++) {
     String[] pieces = split(lines[x], ",");
+    currentCountry = new Country("placeholder", -12, randomColor());
     if (pieces.length == 4) {
-
       String country = pieces[3];
-      Country currentCountry = new Country(country, lineHeight, randomColor());
-      this.countries.add(currentCountry);
-      
+
+      currentCountry = setCountry(country);
+
       this.leaders[recordCount] = new Leader(pieces, currentCountry);
+      currentCountry.addLeader(this.leaders[recordCount]);
+
 
       if (this.leaders[recordCount].heightInCM < this.minLeaderHeight) {
         this.minLeaderHeight = this.leaders[recordCount].heightInCM;
@@ -231,15 +251,38 @@ void getDataFromFile(String filename) {
       if (this.leaders[recordCount].heightInCM > this.maxLeaderHeight) {
         this.maxLeaderHeight = this.leaders[recordCount].heightInCM;
       }
-      
+
       recordCount++;
-      lineHeight += 20;
-    
     }
   }
-  
+  setGroupedCountries();
   verifiyLeadersLength(recordCount);
 }
+
+void setGroupedCountries() {
+  Country allCountries = setCountry("All");
+  for (int i = 0; i < this.leaders.length - 1; i++) {
+    allCountries.addLeader(this.leaders[i]);
+  }
+}
+
+Country setCountry(String countryName) {
+
+  Country currentCountry;
+
+  if (!this.countries.containsKey(countryName)) {
+    currentCountry = new Country(countryName, lineHeight, randomColor());
+    this.countries.put(countryName, currentCountry);
+    this.lineHeight += 15;
+  }
+  else {
+    currentCountry = this.countries.get(countryName);
+  }  
+
+
+  return currentCountry;
+}
+
 
 void verifiyLeadersLength(int recordCount) {
   if (recordCount != this.leaders.length) {
@@ -248,17 +291,28 @@ void verifiyLeadersLength(int recordCount) {
 }
 
 void drawCountries() {
-  for (int i = 0; i < this.countries.size(); i++) {
-    this.countries.get(i).draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+  Country currentCountry;
+
+  for (Enumeration e = Collections.enumeration(this.countries.values()); e.hasMoreElements(); ) {
+    currentCountry = (Country)e.nextElement();
+    if (!currentCountry.name.equals("All")) {
+      currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+    }
   }
 }
 
 void drawSingleCountry(String country) {
   Country currentCountry;
-  for (int i = 0; i < this.countries.size(); i++) {
-    currentCountry = this.countries.get(i);
-    if (currentCountry.name.equals(country)) {
-    	currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+  if (country.equals("All")) {
+    drawCountries();
+  }
+  else {
+    for (int i = 0; i < this.countries.size(); i++) {
+      currentCountry = this.countries.get(i);
+      if (currentCountry.name.equals(country)) {
+        currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+      }
     }
   }
 }
+
