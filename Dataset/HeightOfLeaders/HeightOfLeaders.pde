@@ -42,7 +42,7 @@ class Country {
       this.leaders.get(i).draw(this.lineHeight, minHeight, maxHeight, minWidth, maxWidth);
     }
   }
-
+  
   void drawKey() {
     fill(this.colorID);
     text(this.name, 20, this.lineHeight);
@@ -124,9 +124,7 @@ void mouseClicked() {
    */
 
   if (this.mouseX < 80) {
-    Country currentCountry;
-    for (Enumeration<Country> e = Collections.enumeration(this.countries.values()); e.hasMoreElements();) {
-      currentCountry = e.nextElement();
+    for (Country currentCountry : this.countries.values()) {
       int countryPoint = currentCountry.lineHeight;
       if (isNear(this.mouseY, countryPoint, 10)) {
         if (currentCountry.name.equals("All")) {
@@ -191,12 +189,9 @@ void drawAxis(int startX, int endX, int startY, int endY) {
 
 void drawKey() {
   /**
-   *  Draws a key from given colorCodes
+   *  Draws a key
    */
-
-  Country currentCountry; 
-  for (Enumeration e = Collections.enumeration(this.countries.values()); e.hasMoreElements(); ) {
-    currentCountry = (Country)e.nextElement();
+  for (Country currentCountry : this.countries.values()) {
     currentCountry.drawKey();
   }
 }
@@ -291,10 +286,7 @@ void verifiyLeadersLength(int recordCount) {
 }
 
 void drawCountries() {
-  Country currentCountry;
-
-  for (Enumeration e = Collections.enumeration(this.countries.values()); e.hasMoreElements(); ) {
-    currentCountry = (Country)e.nextElement();
+  for (Country currentCountry : this.countries.values()) {
     if (!currentCountry.name.equals("All")) {
       currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
     }
@@ -311,6 +303,7 @@ void drawSingleCountry(String country) {
       currentCountry = this.countries.get(i);
       if (currentCountry.name.equals(country)) {
         currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+        break;
       }
     }
   }
