@@ -15,13 +15,14 @@ int minLeaderHeight;
 int maxLeaderHeight;
 int minWidth;
 int maxWidth;
-int MAX_COLOR_VALUE = 230;
-int MIN_COLOR_VALUE = 0;
+int MAX_COLOR_VALUE = 220;
+int MIN_COLOR_VALUE = 20;
 
 class Country {
   String name;                                                                                                                                                                                             
   color colorID;
   int lineHeight;
+  boolean selected;
   ArrayList<Leader> leaders;
 
   public Country (String name, int lineHeight, color colorID) {
@@ -29,6 +30,7 @@ class Country {
     this.lineHeight = lineHeight;
     this.colorID = colorID;
     this.leaders = new ArrayList();
+    this.selected = false;
   }
 
   void addLeader(Leader leader) {
@@ -36,6 +38,14 @@ class Country {
   } 
 
   void draw(int minHeight, int maxHeight, int minWidth, int maxWidth) {
+    
+    if (selected){
+      stroke(0,0,0);  
+    }
+    else{
+      noStroke();
+    }
+    
     for (Leader leader : this.leaders) {
       leader.draw(minHeight, maxHeight, minWidth, maxWidth);
     }
@@ -129,7 +139,7 @@ class Leader {
     this.heightInCM = int(pieces[1]);
     this.heightInFeet = pieces[2];
     this.country = country;
-    this.size = 15;
+    this.size = 12;
     location = 0.0;
   }
 
@@ -144,18 +154,18 @@ class Leader {
     int minX = (int)this.location - this.size/2;
     int maxY = this.country.lineHeight + this.size/2;
     int minY = this.country.lineHeight - this.size/2;
-    if ((x <= maxX) && (x >= minX) && (y <= maxY) && (y >= minY)){
+    if ((x <= maxX) && (x >= minX) && (y <= maxY) && (y >= minY)) {
       return true;
     } 
     return false;
   }
-  
-  void drawInfo(int startingWidth, int startingHeight){
+
+  void drawInfo(int startingWidth, int startingHeight) {
     clearLeaderInfo();
     String outputMessage = this.name;
     outputMessage += "\n" + Integer.toString(this.heightInCM) + "cm";
-    fill(color(0,0,0));
-    text(outputMessage,startingWidth, startingHeight);  
+    fill(color(0, 0, 0));
+    text(outputMessage, startingWidth, startingHeight);
   }
 
   void clicked() {
@@ -167,6 +177,7 @@ class Leader {
 void setup() {
   size(1000, 500);
   smooth();
+  strokeWeight(2);
   ellipseMode(CENTER);
   randomSeed(203);
   this.lineHeight = 20;
@@ -188,17 +199,17 @@ void draw() {
   //drawAxis(this.minWidth - 10, this.maxWidth, 10, this.height -10);
 }
 
-void mouseMoved(){
+void mouseMoved() {
   boolean leaderFound = false;
   for (Leader leader : leaders) {
-    if (leader.isNear(this.mouseX, this.mouseY)){
+    if (leader.isNear(this.mouseX, this.mouseY)) {
       leader.clicked();
       leaderFound = true;
       break;
-    } 
+    }
   }
-  if (!leaderFound){
-    this.clearLeaderInfo();  
+  if (!leaderFound) {
+    this.clearLeaderInfo();
   }
 }
 
@@ -208,7 +219,6 @@ void mouseClicked() {
    *
    *
    */
-  
 
   if (this.mouseX < 80) {
     for (Country currentCountry : this.countries.values()) {
@@ -222,11 +232,15 @@ void mouseClicked() {
         }
         else {
           if (this.mouseButton == LEFT) {
+            currentCountry.selected = true;
             this.cleanScreen();
-            currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
+            this.drawCountries();  
             currentCountry.drawInfo(this.width/4, this.height - 70);
+            currentCountry.selected = false;
           }
           else {
+            this.cleanScreen();
+            currentCountry.selected = true;
             currentCountry.draw(this.minLeaderHeight, this.maxLeaderHeight, this.minWidth, this.maxWidth);
           }
           break;
@@ -236,13 +250,12 @@ void mouseClicked() {
   }
 }
 
-void clearLeaderInfo(){
-  fill(255,255,255);
+void clearLeaderInfo() {
+  fill(255, 255, 255);
   noStroke();
-  rect(20, this.height - 90, 200,80);
-  stroke(0,0,0);
-}
-    
+  rect(20, this.height - 90, 200, 80);
+  stroke(0, 0, 0);
+}    
 
 boolean isIt(int x, int y, color colorID) {
   loadPixels();
