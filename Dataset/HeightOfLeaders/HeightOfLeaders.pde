@@ -33,7 +33,7 @@ void setup() {
   this.START_X = this.width/2;
   this.START_Y = this.height/2;
   background(color(255, 255, 255));
-  this.getDataFromFile("HEIGHTS OF LEADERS.csv");
+  this.getDataFromFile("Data/HEIGHTS OF LEADERS.csv");
   this.leaderCount = this.leaders.length;
   this.drawCountries();
   this.drawKey();
@@ -93,4 +93,3 @@ void mouseClicked() {
     }
   }
 }
-
