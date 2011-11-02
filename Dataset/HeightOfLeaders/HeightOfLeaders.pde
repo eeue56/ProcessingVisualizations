@@ -37,9 +37,11 @@ void setup() {
   this.leaderCount = this.leaders.length;
   this.drawCountries();
   this.drawKey();
+  
 }
 
 void draw() {
+  
 }
 
 void mouseMoved() {
