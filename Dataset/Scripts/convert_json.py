@@ -60,4 +60,4 @@ if __name__ == '__main__':
              u'population']
     prefix = '../Data/'
     
-    convert(prefix + 'country_data.json', prefix + 'country_data.csv', dialect='excel', order=order, exceptions=(u'world'))
+    convert(prefix + 'country_data.json', prefix + 'country_data.csv', dialect='excel', order=order, exceptions=(u'world',))
