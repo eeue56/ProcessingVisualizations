@@ -1,7 +1,6 @@
-import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Enumeration;
-import java.util.Arrays;
+import java.util.Arrays;  
 import java.util.ArrayList;
 import java.lang.Math;
 
@@ -15,8 +14,8 @@ int minLeaderHeight;
 int maxLeaderHeight;
 int minWidth;
 int maxWidth;
-int MAX_COLOR_VALUE = 220;
-int MIN_COLOR_VALUE = 20;
+final int MAX_COLOR_VALUE = 220;
+final int MIN_COLOR_VALUE = 20;
 
 void setup() {
   size(1000, 500);

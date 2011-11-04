@@ -2,7 +2,7 @@ void getDataFromFile(String filename) {
   String[] lines;
   int recordCount = 0;
   lines = loadStrings(filename);
-  this.leaders = new Leader[lines.length];
+  this.leaders = new Leader[lines.length-1];
   int lineHeight = 20;
   Country currentCountry;
 

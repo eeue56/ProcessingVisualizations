@@ -1,3 +1,5 @@
+from math import sqrt
+
 class Country(object):
 
     def __init__(self, name):
@@ -57,6 +59,10 @@ class Country(object):
         self._verify_at_least_1_member()
         return sum(member.height for member in self.members.values())/float(self.number_of_members())
 
+    def standard_deviation(self):
+        mean = self.average_height()
+        variance = sum((member.height - mean) ** 2 for member in self.members.values())
+        return sqrt(variance)
 
 class Member(object):
 

@@ -23,6 +23,7 @@ def main(filename):
         print 'The tallest member is {}, who is {}cm'.format(country.tallest_member(),country.tallest_height())
         print 'The shortest member is {}, who is {}cm'.format(country.shortest_member(),country.shortest_height())
         print 'The average height is {:2g}cm'.format(country.average_height())
+        print 'The standard deviation is {}'.format(country.standard_deviation())
         print '\n\n'
        
 
