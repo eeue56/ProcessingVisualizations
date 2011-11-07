@@ -49,7 +49,15 @@ def generate_rules(string_list, delimiter=None):
     return rules
 
 def standardize_csv_file(csv_file, rules_file, dialect=None ):
-
+    """ Standardizes a given csv file based on rules file
+        Csv file is a file to read and correct
+        rules file is a file to read and generate rules from
+        dialect is the dialect of the csv file, defaults to excel
+        Todo: Impliment a field-only standardization method
+        So far this has been tricky, and hasn't saved any processing
+        time. Need to have a think about this.
+    """
+    
     if dialect is None:
         dialect = 'excel'
 
