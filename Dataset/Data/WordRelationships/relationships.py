@@ -176,7 +176,6 @@ def make_longest_sentence(data):
             current_word = current_word.most_connected_after
 
         
-
 if __name__ == '__main__':
 
     with open('pg42.txt') as f:
