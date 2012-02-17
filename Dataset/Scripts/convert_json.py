@@ -19,9 +19,9 @@ def _is_not_duplicate(item, been=[]):
     Returns False if item has been, true otherwise
     """
     
-    if item['title'] in been:
+    if item in been:
         return False
-    been.append(item['title'])
+    been.append(item)
     return True
 
 def convert(input_name, output_name=None, dialect=None, order=None, exceptions=None, item_checker=None):
@@ -39,7 +39,7 @@ def convert(input_name, output_name=None, dialect=None, order=None, exceptions=N
         exceptions = tuple()
 
     if item_checker is None:
-        item_checker = lambda x: True if x else False
+        item_checker = lambda x: True
 
     if dialect is None:
         dialect = 'excel'
@@ -66,9 +66,9 @@ def convert(input_name, output_name=None, dialect=None, order=None, exceptions=N
         rows.append(headers)
         
         for index in keys:
-            current_row = json_data[index] 
-
-            if not item_checker(current_row):
+            current_row = json_data[index]
+            
+            if not item_checker(current_row[headers[0].lower()]):
                 continue
             
             if order is None:
