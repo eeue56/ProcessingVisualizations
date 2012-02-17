@@ -220,5 +220,5 @@ if __name__ == '__main__':
     with open('pg42.txt') as f:
         other_data = [line for line in f if len(line.strip()) > 1]
         data = map_words(other_data, data)
-
+        
     print make_sentence(data)
