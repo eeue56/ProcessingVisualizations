@@ -206,9 +206,32 @@ def make_longest_sentence(data):
         else:
             current_word = current_word.most_connected_after
 
-        if current_word.is_finishing_word:
+        if current_word.is_ending_word:
             break
     
+def make_longest_sentence_with_no_repeats(data):
+
+    already_been = []
+    none_can_be_found = False
+
+    current_word = highest_connected_word((word for word in data.values() if word.is_starting_word))
+
+    while True:
+        already_been.append(current_word)
+
+        possible_words = Word.sort_by_number_of_connections(current_word.afters)
+        for word in possible_words[::-1]:
+            if word not in already_been:
+                current_word = word
+                break
+        else:
+            none_can_be_found = True
+             
+        if current_word.is_ending_word or none_can_be_found:
+            already_been.append(current_word)
+            break
+
+    return ' '.join(already_been)
 
         
 if __name__ == '__main__':
@@ -217,12 +240,12 @@ if __name__ == '__main__':
         data = [line for line in f if len(line.strip()) > 1]
         data = map_words(data)
 
-    with open('pg42.txt') as f:
+    """with open('pg42.txt') as f:
         other_data = [line for line in f if len(line.strip()) > 1]
-        data = map_words(other_data, data)
+        data = map_words(other_data, data)"""
 
     with open('data.txt') as f:
         other_data = [line for line in f if len(line.strip()) > 1]
         data = map_words(other_data, data)
-        
-    print make_sentence(data)
+    
+    print make_longest_sentence(data)
