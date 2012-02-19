@@ -12,13 +12,13 @@ class Word(str):
 
     def add_before(self, other_word):
         if other_word not in self.befores:
-            self.befores[other_word] = 0
+            self.befores[other_word] = 1
 
         self.befores[other_word] += 1
 
     def add_after(self, other_word):
         if other_word not in self.afters:
-            self.afters[other_word] = 0
+            self.afters[other_word] = 1
         
         self.afters[other_word] += 1
 
