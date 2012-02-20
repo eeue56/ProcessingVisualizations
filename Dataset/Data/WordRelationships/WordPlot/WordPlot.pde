@@ -74,16 +74,49 @@ color randomColor() {
 
 void plotByValues(Word word){
   stroke(randomColor());
-  float x = map(word.afters, 0, maxAft, startX,  width - 10);
-  float y = map(word.befores, 0, maxBef, startY, 10);
+  float x = map(word.afters, 0, maxAft, startX,  width - 20);
+  float y = map(word.befores, 0, maxBef, startY, 20);
   point(x, y);
 }
 
 void plotByRatio(Word word){
    stroke(randomColor());
-   float x = map(occur(word), 0, maxOccur, startX, width - 10);
-   float y = map((word.afters + 1)/(word.befores + 1), 0.0, 5.0, startY, 10);
+   float x = map(occur(word), 0, maxOccur, startX, width - 20);
+   float y = map((word.afters + 1)/(word.befores + 1), 0.0, 5.0, startY, 20);
    point(x, y);
+}
+
+void plotByRatios(Word word){
+  stroke(randomColor());
+  float iOccur = word.befores + word.afters;
+  
+  float newX = word.befores / iOccur;
+  float newY = word.afters / iOccur;
+  
+  float x = map(newX, 0.0, 1.0, startX, width - 20);
+  float y = map(newY, 0.0, 1.0, startY, 20);
+  
+  point(x, y); 
+}
+
+void plotWordByRatios(Word word){
+  fill(randomColor());
+  float iOccur = word.befores + word.afters;
+  
+  float newX = word.befores / iOccur;
+  float newY = word.afters / iOccur;
+  
+  float x = map(newX, 0.0, 1.0, startX, width - 20);
+  float y = map(newY, 0.0, 1.0, startY, 20);
+  
+  text(word.word, x, y); 
+}
+
+void plotWordByValues(Word word){
+  fill(randomColor());
+  float x = map(word.afters, 0, maxAft, startX,  width - 20);
+  float y = map(word.befores, 0, maxBef, startY, 20);
+  text(word.word, x, y);
 }
 
 void setup() {
@@ -93,7 +126,7 @@ void setup() {
   randomSeed(250);
 
   words = new ArrayList<Word>();
-  loadData("data.csv");
+  loadData("pg11.csv");
 
   startX = 10;
   startY = height - 10;
@@ -105,15 +138,17 @@ void setup() {
   maxOccur = maxOcc();
 
   //draw x
-  line(startX, startY, width - 10, startY);
+  line(startX, startY, width - 20, startY);
   //draw y
-  line(startX, 10, startX, startY);
+  line(startX, 20, startX, startY);
 
-  strokeWeight(5);
+  strokeWeight(1);
+  textSize(8);
+  rectMode(CENTER);
   
   for (Word word : words) { 
     
-     plotByRatio(word);
+     plotWordByValues(word);
   }
 }
 
