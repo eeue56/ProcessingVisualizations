@@ -126,7 +126,7 @@ void setup() {
   randomSeed(250);
 
   words = new ArrayList<Word>();
-  loadData("pg11.csv");
+  loadData("all.csv");
 
   startX = 10;
   startY = height - 10;
@@ -142,13 +142,13 @@ void setup() {
   //draw y
   line(startX, 20, startX, startY);
 
-  strokeWeight(1);
+  strokeWeight(5);
   textSize(8);
   rectMode(CENTER);
   
   for (Word word : words) { 
     
-     plotWordByValues(word);
+     plotByValues(word);
   }
 }
 
