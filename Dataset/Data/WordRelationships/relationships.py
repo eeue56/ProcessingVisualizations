@@ -236,16 +236,16 @@ def make_longest_sentence_with_no_repeats(data):
         
 if __name__ == '__main__':
 
-    with open('pg11.txt') as f:
+    """with open('pg11.txt') as f:
         data = [line for line in f if len(line.strip()) > 1]
         data = map_words(data)
 
-    """with open('pg42.txt') as f:
+    with open('pg42.txt') as f:
         other_data = [line for line in f if len(line.strip()) > 1]
         data = map_words(other_data, data)"""
 
     with open('data.txt') as f:
         other_data = [line for line in f if len(line.strip()) > 1]
-        data = map_words(other_data, data)
+        data = map_words(other_data)
     
-    print make_longest_sentence(data)
+    print make_sentence(data)

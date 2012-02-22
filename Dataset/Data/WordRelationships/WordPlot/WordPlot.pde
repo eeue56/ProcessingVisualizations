@@ -66,7 +66,7 @@ color randomColor() {
   int[] randomValues = new int[3];
   
   for (int x = 0; x < 3; x++) {
-    randomValues[x] = int(random(0, 255));
+    randomValues[x] = int(random(30, 220));
   }
   
   return color(randomValues[0], randomValues[1], randomValues[2]);
@@ -142,13 +142,12 @@ void setup() {
   //draw y
   line(startX, 20, startX, startY);
 
-  strokeWeight(5);
-  textSize(8);
+  strokeWeight(4);
+  textSize(10);
   rectMode(CENTER);
   
   for (Word word : words) { 
-    
-     plotByValues(word);
+     plotByRatios(word);
   }
 }
 
