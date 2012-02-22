@@ -1,0 +1,23 @@
+Future things to inspect for word relationships:
+
+    1) It should be possible, given a large enough training set, to work out whether or
+        not a word is sensible in the given context. For example, if we had a dataset with the sentences
+            ''' Hello fishfrog, the cat sat on the mat.
+                Today is Thursday, I sat down on the dog yesterday. '''
+        then if given the sentence
+            ''' Hello dog Thursday, I sat on the mat.'''
+        it could tell us that dog or Thursday can't be there. It could also act as a spellchecker.
+
+    2) The current system handles things like quotes rather badly. This needs fixing - perhaps adding a subclass of Word
+        as QuotedWord or something similar, that would handle the sentence as sentences are currently handled, but replace
+        start/end word syntax with matching "(', etc.
+
+    3) There needs to be a better way to show all these relationships. Printing a sentence at a time is interesting,
+        but it's not very useful.
+
+    4) Apply proper ML/AI algorithms to allow a better, more realistic reaction. Using current methods require an amazingly
+        large dataset to work with in order to allow for possible options.
+
+    5) Perhaps apply some kind of grouping for similar words - for example, if two different words have the same connected
+        words then they're of the same group. This will hopefully allow us to find things like nouns of adjactives.
+

@@ -9,7 +9,6 @@ def standardize(word, rules):
     given otherwise
     """
 
-    
     if not any([word.lower() in values for values in rules.values()]):
         return word
     
@@ -26,6 +25,7 @@ def generate_rule(string, delimiter=None):
         the items as values (unwanted forms)
         N.B, list must produce at least 2 elements
     """
+
     if delimiter is None:
         delimiter = ','
 
@@ -70,8 +70,10 @@ def standardize_csv_file(csv_file, rules_file, dialect=None ):
     
         for line in csv_data:
             current_row = list()
+        
             for item in line:
                 current_row.append(standardize(item, rules))
+
             new_csv_data.append(current_row)
         
     with open(csv_file,'wb') as f:
@@ -84,3 +86,4 @@ if __name__ == '__main__':
     t = time.time()
     standardize_csv_file('../Data/country_data.csv', '../Data/Rules/country_names.csv')
     print time.time() - t 
+    
