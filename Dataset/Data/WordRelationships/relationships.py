@@ -28,6 +28,10 @@ class Word(str):
     def is_ending_word(self):
         return len(self.afters) == 0
 
+    @property
+    def number_of_relationships(self):
+        return len(self.afters) + len(self.befores)
+
     def __eq__(self, other):
         return self.word == other.word
 
@@ -52,7 +56,7 @@ def sentencify(data):
     for line in data:
         line = line.strip()
         
-        line = [letter for letter in line if letter not in ':,()']
+        line = [letter for letter in line if letter not in ':,']
 
         if line == '':
                 continue
@@ -113,18 +117,21 @@ def make_sentence(data):
     sentence.append(current_word)
 
     while True:
+        print current_word.number_of_relationships,
         if not current_word.afters:
-            print current_word
+            
             break
 
         current_word = data[choice(current_word.afters.keys())]
         sentence.append(current_word)
 
+    print
+
     return ' '.join(sentence)
 
 if __name__ == '__main__':
 
-    with open('data.txt') as f:
+    with open('pg42.txt') as f:
         data = [line for line in f if len(line.strip()) > 1]
         data = map_words(data)
 
