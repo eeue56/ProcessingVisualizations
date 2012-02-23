@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from string import ascii_letters, ascii_uppercase
 from random import choice
 
-class Word(str):
+class Word(object):
     '''
         Word class for managing relationships to other words
     '''
@@ -34,11 +36,6 @@ class Word(str):
     def is_ending_word(self):
         return len(self.afters) == 0
 
-    @property
-<<<<<<< HEAD
-    def number_of_relationships(self):
-        return len(self.afters) + len(self.befores)
-=======
     def number_of_connections(self):
         return sum(self.afters.values()) + sum(self.befores.values())
 
@@ -59,13 +56,15 @@ class Word(str):
     @property
     def most_connected_after(self):
         return Word.sort_by_number_of_connections(self.afters.keys())[-1]
->>>>>>> 9855146fc52f382d50fc9d6317151db29f55f878
-
+    
     def __eq__(self, other):
         return self.word == other
 
     def __str__(self):
-        return str(self.word)   
+        return unicode(self.word)
+
+    def __unicode__(self):
+        return unicode(self.word)
 
     def __hash__(self):
         return hash(self.word)
@@ -90,17 +89,30 @@ def is_end_word(word):
 def sentencify(data):
     ''' takes in a string seperated by newlines, then breaks it down into sentences'''
 
+    new_data = []
+
+    if not isinstance(data[0], unicode):
+        for line in data:
+            try:
+                new_data.append(line.decode('utf-8'))
+            except UnicodeDecodeError:
+                hm_line = []
+                print line
+                for char in line:
+                    try:
+                        hm_line.append(char.decode('utf-8'))
+                    except UnicodeDecodeError:
+                        print repr(char)
+                new_data.append(u' '.join(char))
+    else:
+        new_data = data[:]
     sentences = []
     current_sentence = []
 
-    for line in data:
+    for line in new_data:
         line = line.strip()
         
-<<<<<<< HEAD
-        line = [letter for letter in line if letter not in ':,']
-=======
         line = clean_line(line)
->>>>>>> 9855146fc52f382d50fc9d6317151db29f55f878
 
         if line == '':
                 continue
@@ -109,7 +121,7 @@ def sentencify(data):
             current_sentence.append(word)
             
             if is_end_word(word):
-                sentences.append(' '.join(current_sentence))
+                sentences.append(u' '.join(unicode(word) for word in current_sentence))
                 current_sentence = []
 
     return sentences
@@ -145,7 +157,6 @@ def map_words(text, words=None):
 
         returns a dict mapping words to other words
     '''
-
     if words is None:
         words = dict()
     
@@ -184,20 +195,13 @@ def make_sentence(data):
     sentence.append(current_word)
 
     while True:
-        print current_word.number_of_relationships,
         if not current_word.afters:
-<<<<<<< HEAD
-            
-=======
->>>>>>> 9855146fc52f382d50fc9d6317151db29f55f878
             break
 
         current_word = data[choice(current_word.afters.keys())]
         sentence.append(current_word)
 
-    print
-
-    return ' '.join(sentence)
+    return ' '.join(str(word) for word in sentence)
 
 def make_longest_sentence(data):
     ''' Proof of concept. Aims to produce an infinitly long sentence based on the relationship data
@@ -252,20 +256,16 @@ def make_longest_sentence_with_no_repeats(data):
         
 if __name__ == '__main__':
 
-<<<<<<< HEAD
-    with open('pg42.txt') as f:
-=======
     with open('pg11.txt') as f:
->>>>>>> 9855146fc52f382d50fc9d6317151db29f55f878
         data = [line for line in f if len(line.strip()) > 1]
         data = map_words(data)
 
-    """with open('pg42.txt') as f:
-        other_data = [line for line in f if len(line.strip()) > 1]
-        data = map_words(other_data, data)"""
-
-    with open('data.txt') as f:
+    with open('pg42.txt') as f:
         other_data = [line for line in f if len(line.strip()) > 1]
         data = map_words(other_data, data)
     
-    print make_longest_sentence(data)
+    """with open('data.txt') as f:
+        other_data = [line for line in f if len(line.strip()) > 1]
+        data = map_words(other_data)"""
+    
+    print make_sentence(data)
