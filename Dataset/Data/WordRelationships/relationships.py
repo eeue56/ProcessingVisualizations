@@ -44,16 +44,17 @@ class Word(object):
     def number_of_afters(self):
         return sum(self.afters.values())
 
+    @property
     def number_of_connections(self):
         return sum(self.afters.values()) + sum(self.befores.values())
 
     @property
     def ratio_of_befores(self):
-        return(self.number_of_befores + 0.0) / self.number_of_connections() 
+        return(self.number_of_befores + 0.0) / self.number_of_connections 
 
     @property
     def ratio_of_afters(self):
-        return (self.number_of_afters + 0.0) / self.number_of_connections()
+        return (self.number_of_afters + 0.0) / self.number_of_connections
 
     @property
     def most_paired_before(self):

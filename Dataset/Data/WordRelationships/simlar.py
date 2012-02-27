@@ -4,10 +4,10 @@ from codecs import open as open_
 
 
 def dataset_size(dataset):
-    return sum(word.number_of_connections() for word in dataset.values())
+    return sum(word.number_of_connections for word in dataset.values())
 
 def ratio_of_usage(word, data_size):
-    return (word.number_of_connections() + 0.0) / data_size
+    return (word.number_of_connections + 0.0) / data_size
 
 def absolute_ratings(shared_words, dataset_1, dataset_2):
 
