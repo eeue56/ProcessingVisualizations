@@ -1,5 +1,4 @@
 from relationships import map_words
-from exporting import read_file
 
 from codecs import open as open_
 
@@ -15,14 +14,14 @@ def absolute_ratings(shared_words, dataset_1, dataset_2):
     ratings = dict((word, {'before' : 0, 'after' : 0}) for word in shared_words)
 
     for word, dic in ratings.iteritems():
-        dic['before'] = dataset_1[word].ratio_of_befores - dataset_2[word].ratio_of_befores
-        dic['after'] = dataset_1[word].ratio_of_afters - dataset_2[word].ratio_of_afters
+        dic['before'] = dataset_1[word].ratio_of_befores
+        dic['after'] = dataset_1[word].ratio_of_afters
 
     return ratings
 
 def perfect_matches(ratings):
 
-    return [word for word, dic in ratings.iteritems() if dic['after'] == 0.0 and dic['before'] == 0.0]
+    return [word for word, dic in ratings.iteritems() if dic['after'] == dic['before']]
 
 def usage_ratings(shared_words, dataset_1, dataset_2):
     dataset_1_size = dataset_size(dataset_1)
@@ -62,7 +61,7 @@ def afters_near_absolute_value(ratings, near_value):
     for word, dic in ratings.iteritems():
         if is_near_value(dic['after'], near_value):
             output.append(word)
-
+    
     return output
 
 def all_near_absolute_value(ratings, near_value):
@@ -87,6 +86,7 @@ def test():
 
     words = shared_words([alice_data, jekyll_data])
 
+
     """print words
     print len(words)
     print len(alice_data)
@@ -97,21 +97,24 @@ def test():
 
     print perfect_matches(absolute_ratings(words, alice_data, jekyll_data))"""
 
-    near_value = 0.000001
+    near_value = 0.001
     all_near_usage = all_near_usage_value(usage_ratings(words, alice_data, jekyll_data), near_value)
     """print all_near
     print len(all_near)"""
 
     absolute = absolute_ratings(words, alice_data, jekyll_data)
-
+    print perfect_matches(absolute)
     all_near_absolute = all_near_absolute_value(absolute, near_value)
+    
     #print len(all_near_absolute)
 
     for word in all_near_usage:
-        if word in all_near_absolute:
+        if word in perfect_matches(absolute):
             print word
 
 if __name__ == '__main__':
+    
+    from exporting import read_file
     test()
 
     
